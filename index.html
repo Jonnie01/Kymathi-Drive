@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body{
+                background-color: rgba(8, 8, 100, 0.582);
+            }
+            .hidescore{
+                display:none;
+             
+            }
+            
+            .startScreen{
+                height: 400px;
+                background-color:red;
+                margin: auto;
+                z-index: 1;
+                width:350px;
+                border-style: dashed;
+                text-align: center;
+            }
+            .startScreen:hover{
+                cursor: pointer;
+            }
+            .restart{
+                height: 400px;
+                background-color:rgb(0, 255, 128);
+                margin: auto;
+                z-index: 1;
+                width:350px;
+                border-style: dashed;
+                text-align: center;
+                font-size: 50px;
+            
+            }
+            .name{
+                font-size: 50px;
+            }
+            .click{
+                font-size: 20px;
+            }
+            .hide{
+                display:none;
+             
+            }
+            
+            .score{
+                background-color: black;
+                height: 0px;
+                text-align: center;
+                font-size: 25px;
+                color:white;
+                font-family: fantasy;
+            }
+            .scores{
+                background-color: rgb(223, 117, 30);
+                height: 50px;
+                text-align: center;
+                font-size: 40px;
+                color:white;
+                font-family:fantasy;
+            }
+            
+            .car{
+                position: absolute;
+                margin: auto;
+                bottom: 100px;
+                left: 0px;
+                width: 50px;
+                height: 100px;
+                background-color: rgb(1, 250, 97);
+                font-size: 15px;
+                text-align: center;
+                border-radius: 15px;
+                border-style: dashed;
+            }
+            .enemy{
+                position: absolute;
+                margin: auto;
+                bottom: 100px;
+                left: 0px;
+                width: 50px;
+                height: 100px;
+                background-color: blue;
+                font-size: 45px;
+                text-align: center;
+                border-radius: 10px;
+                border-style:outset;
+            }
+            .gameArea{
+                background-color:black;
+                width: 200px;
+                height:800px;
+                overflow: hidden;
+                margin: auto;
+                position: relative;
+                color: white;
+                font-size: 45px;
+                
+            }
+            .line{
+                background-color: white;
+                width: 10px;
+                height: 100px;
+                position: absolute;
+                margin-left: 95px;
+            }
+            #copyright{
+                font-family: fantasy;
+                position: fixed;
+                top: 600px;
+                right: 1px;
+            
+            }</style>
+        <title>Car Project</title>
+    </head>
+    <body>
+        <div class="score"></div>
+        <div class="game">
+            <div class="startScreen">
+                <p class="name">KYMATHI</p>
+            </br>
+                 <p class="name">DRIVE</p>
+        </br>
+          <p class="click">CLICK TO START THE GAME</p>
+
+
+            </div>
+            <div class="gameArea hide">
+            
+        </div>
+        <div id="copyright">
+            <p>KYMATHI DRIVE</p>
+        <p>Created by:Ndigirigi John</p></div>
+
+
+
+
+        <script>
+            const startScreen=document.querySelector(".startScreen");
+const score=document.querySelector(".score");
+const gameArea=document.querySelector(".gameArea");
+
+
+let player={speed:8,
+            score:0 
+}
+
+let keys={
+    ArroRight:false,
+    ArrowLeft:false,
+    ArrowDown:false,
+    ArrowUp:false
+}
+
+
+document.addEventListener("keydown",pressOn)
+document.addEventListener("keyup",pressOff)
+
+startScreen.addEventListener("click",start);
+
+
+
+function moveLines(){
+    let linez=document.querySelectorAll(".line")
+    linez.forEach(function(item){
+        if (item.y>1500){item.y-=1500}
+        item.y+=5;
+    item.style.top=item.y+"px";
+    }
+    )
+}
+
+
+function isCollide(a,b){
+    let aRect=a.getBoundingClientRect();
+    let bRect=b.getBoundingClientRect();
+    return !(
+        (aRect.bottom<bRect.top)||
+        (aRect.top>bRect.bottom)||
+        (aRect.left>bRect.right)||
+        (aRect.right<bRect.left)
+    )
+}
+
+
+function moveEnemy(car){
+    let enemi=document.querySelectorAll(".enemy")
+    enemi.forEach(function(item){
+        if(isCollide(car,item)){endGame();}
+
+        if (item.y>=1000){item.y-=1500}
+        item.y+=6;
+    item.style.top=item.y+"px";
+    }
+    )
+}
+
+
+function playGame(){
+    let car=document.querySelector(".car")
+    let road=gameArea.getBoundingClientRect();
+    
+    moveLines();
+    moveEnemy(car);
+
+
+
+    if(player.start){
+        if(keys.ArrowUp&&player.y>road.top-700){ player.y-=player.speed;}
+        if(keys.ArrowDown &&player.y<road.bottom-200){ player.y+=player.speed;}
+        if(keys.ArrowRight&&player.x<145){ player.x+=player.speed;}
+        if(keys.ArrowLeft&&player.x>5){ player.x-=player.speed;}
+
+        car.style.left=player.x+"px"
+        car.style.top=player.y+"px"
+
+
+
+  window.requestAnimationFrame(playGame);
+}
+   player.score++;
+   score.innerText="Score: "+player.score;
+}
+
+function endGame(){
+    player.start=false;
+    score.classList.add("hidescore")
+    startScreen.classList.remove("hide")
+    startScreen.classList.add("restart")
+    startScreen.innerHTML="GAME OVER!<br> YOUR SCORE WAS: "+player.score+" <br>CLICK TO RESTART"
+}
+
+
+function start(){
+    startScreen.classList.add("hide");
+    gameArea.classList.remove("hide");
+    score.classList.remove("hidescore")
+    score.classList.add("scores")
+    gameArea.innerHTML=""
+
+    
+    player.score=0
+    player.start=true
+       for(x=0;x<=10; x++){ 
+        let lines=document.createElement("div")
+        lines.classList.add("line");
+        lines.y=x*150
+        lines.style.top=(x*150)+"px";
+        gameArea.appendChild(lines)
+       
+       }
+    window.requestAnimationFrame(playGame);
+    let car=document.createElement("div")
+    car.setAttribute("class","car")
+    car.innerText="KyMo1"
+    gameArea.appendChild(car)
+    player.x=car.offsetLeft;
+    player.y=car.offsetTop;
+
+    for(x=0;x<3; x++){ 
+        let enemy=document.createElement("div")
+        enemy.classList.add("enemy");
+        enemy.innerHTML=(x+1)
+        enemy.y=((x+1)*500)*-1
+        enemy.style.left=Math.floor(Math.random()*180)+"px";
+
+
+        enemy.style.top=enemy.y+"px";
+        enemy.style.backgroundColor=randomColor();
+        gameArea.appendChild(enemy)
+
+
+       
+       }
+
+
+
+    }
+
+
+function pressOn(e){
+    e.preventDefault();
+    keys[e.key]=true;
+   
+}
+function pressOff(f){
+    f.preventDefault();
+    keys[f.key]=false;
+   
+}
+
+function randomColor(){
+    function c(){
+        let hex=Math.floor(Math.random()*256).toString(16);
+        return("0"+String(hex)).substr(-2)
+    }
+    return"#"+c()+c()+c();
+}
+
+
+        </script>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="/__/firebase/8.2.2/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="/__/firebase/8.2.2/firebase-analytics.js"></script>
+
+<!-- Initialize Firebase -->
+<script src="/__/firebase/init.js"></script>
+    </body>
+</html>
